@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+    <head>
+    </head>
+    <body>
+
+        <canvas id="game" height="400px" width="600" style="background:#ccc"></canvas>
+
+        <script>
+
+            var canvas = document.getElementById('game');   
+            var ctx = canvas.getContext('2d');
+
+            
+
+            var keys = {};
+
+            var render = function() {
+
+                var playerTileCoords = findTileCoordinates(player.x, player.y);
+                processInput();
+                ctx.clearRect(0,0, 600, 400);
+
+
+                for(var tY in scene) {
+                    var row = scene[tY];
+                    for(var tX in row) {
+                        var tile = row[tX];
+                        //If the players footprint falls within this tile
+                        //Perform narrow phase collision check
+                        // if(tile.collidable){
+                        //     for(var i in playerTileCoords) {
+                        //         if(playerTileCoords[i].tX == tX && playerTileCoords[i].tY == tY) {
+
+                                    
+
+                        //             break;
+                        //         }
+                        //     }
+                        // }
+
+                        if(tY * 64 + 64 >= viewport.y && tX * 64 + 64 >= viewport.x) {
+                            
+                            ctx.fillStyle= spriteSheet[tile.image];
+                            ctx.fillRect(tX * 64 - viewport.x, tY * 64 - viewport.y, 64, 64);
+                           
+                        }
+                    }
+                }
+
+                // var keys = Object.keys(playerTileCoords);
+                // for(let i in keys) {
+                //     var p = playerTileCoords[keys[i]];
+                //     ctx.strokeStyle = "red";
+                //     ctx.strokeRect(p.tX * 64 - viewport.x, p.tY * 64 - viewport.y, 64, 64);
+                // }
+
+                ctx.fillStyle = 'red';
+                ctx.fillRect(player.x - viewport.x, player.y - viewport.y, 32, 32);
+                window.requestAnimationFrame(render);
+            };
+
+            document.addEventListener('keydown', function(e) {
+                keys[e.key] = true;
+            });
+
+            document.addEventListener('keyup', function(e) {
+                delete keys[e.key];
+            });
+
+            render();
+
+            function findTileCoordinates(pX, pY) {
+
+                var points = {
+                    'topLeft': {pX: pX, pY: pY},
+                    'bottomRight': {pX: pX + 32, pY: pY + 32},
+                    'topRight': {pX: pX + 32, pY: pY},
+                    'bottomLeft': {pX: pX, pY: pY + 32} 
+                }
+                
+                var keys = Object.keys(points);
+                for(var i in keys) {
+                    var key = keys[i];
+                    var tX = points[key].pX / 64;
+                    var tY = points[key].pY / 64;
+                    
+                    
+                    var iTx = parseInt(tX);
+                    var iTy = parseInt(tY);
+                    
+                    
+                    if(key === 'topRight' || key === 'bottomRight') {
+                        if(tX - iTx <= 0) {
+                            iTx--;
+                        }
+                    } else {
+                        if(tX - iTx < 0) {
+                            iTx--;
+                        }
+                    }
+
+                    if(key === 'bottomLeft' || key === 'bottomRight') {
+                        if(tY - iTy <= 0) {
+                            iTy--;
+                        }
+                    } else {
+                        if(tY - iTy < 0) {
+                            iTy--;
+                        }
+                    }
+
+                    points[key] = { tX: iTx, tY: iTy};
+                }
+
+                return points;
+            }
+
+            function findPixelPosition(tX, tY) {
+                return {x: 0, y: 0};
+            }
+            
+            function processInput() {
+                
+                if(keys['s']) {
+                    var coords = findTileCoordinates(player.x, player.y + 1);
+                    
+                    var allowed = 0;
+
+                    //Check if a tile exists at top left
+                    if(scene[coords.bottomRight.tY]) {
+                        if(scene[coords.bottomRight.tY][coords.bottomRight.tX]) {
+                            if(!scene[coords.bottomRight.tY][coords.bottomRight.tX].collidable) {
+                                allowed++;
+                            }
+                        }
+                    }
+
+                    //Check if a tile exists at top left
+                    if(scene[coords.bottomLeft.tY]) {
+                        if(scene[coords.bottomLeft.tY][coords.bottomLeft.tX]) {
+                            if(!scene[coords.bottomLeft.tY][coords.bottomLeft.tX].collidable) {
+                                allowed++;
+                            }
+                        }
+                    }
+
+                    if(allowed === 2) {
+                        player.y++;
+                        if(player.y + 64 > viewport.y + viewport.height) {
+                            viewport.y++;
+                        }
+                    }
+                }
+
+                if(keys['w']) {
+
+                   
+                    var coords = findTileCoordinates(player.x, player.y - 1);
+                    
+
+                    var allowed = 0;
+
+                    //Check if a tile exists at top left
+                    if(scene[coords.topLeft.tY]) {
+                        if(scene[coords.topLeft.tY][coords.topLeft.tX]) {
+                            if(!scene[coords.topLeft.tY][coords.topLeft.tX].collidable) {
+                                allowed++;
+                            }
+                        }
+                    }
+
+                    //Check if a tile exists at top left
+                    if(scene[coords.topRight.tY]) {
+                        if(scene[coords.topRight.tY][coords.topRight.tX]) {
+                            if(!scene[coords.topRight.tY][coords.topRight.tX].collidable) {
+                                allowed++;
+                            }
+                        }
+                    }
+
+                    if(allowed === 2) {
+                        player.y--;
+                        if(player.y - 64 < viewport.y) {
+                            viewport.y--;
+                        }
+                    }
+                }
+
+                if(keys['a']) {
+                    var coords = findTileCoordinates(player.x - 1, player.y);
+                    
+                    var allowed = 0;
+
+                    //Check if a tile exists at top left
+                    if(scene[coords.topLeft.tY]) {
+                        if(scene[coords.topLeft.tY][coords.topLeft.tX]) {
+                            if(!scene[coords.topLeft.tY][coords.topLeft.tX].collidable) {
+                                allowed++;
+                            }
+                        }
+                    }
+
+                    //Check if a tile exists at top left
+                    if(scene[coords.bottomLeft.tY]) {
+                        if(scene[coords.bottomLeft.tY][coords.bottomLeft.tX]) {
+                            if(!scene[coords.bottomLeft.tY][coords.bottomLeft.tX].collidable){
+                                allowed++;
+                            }
+                        }
+                    }
+
+                    if(allowed === 2) {
+                        player.x--;
+                        if(player.x - 64 < viewport.x) {
+                            viewport.x--;
+                        }
+                    }
+                }
+
+                if(keys['d']) {
+                    var coords = findTileCoordinates(player.x + 1, player.y);
+                    
+                    var allowed = 0;
+
+                    //Check if a tile exists at top left
+                    if(scene[coords.topRight.tY]) {
+                        if(scene[coords.topRight.tY][coords.topRight.tX]) {
+                            if(!scene[coords.topRight.tY][coords.topRight.tX].collidable) {
+                                allowed++;
+                            }
+                        }
+                    }
+
+                    //Check if a tile exists at top left
+                    if(scene[coords.bottomRight.tY]) {
+                        if(scene[coords.bottomRight.tY][coords.bottomRight.tX]) {
+                            if(!scene[coords.bottomRight.tY][coords.bottomRight.tX].collidable) {
+                                allowed++;
+                            }
+                        }
+                    }
+
+                    if(allowed === 2) {
+                        player.x++;
+                        if(player.x + 64 > viewport.x + viewport.width) {
+                            viewport.x++;
+                        }
+                    }
+                }
+            }
+
+        </script>
+    </body>
+</html>
