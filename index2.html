@@ -12,7 +12,157 @@
 
             });
 
+
+            function Constraint(vectorA, vectorB, constraintVector) {
+                this.vectorA = vectorA;
+                this.vectorB = vectorB;
+                this.constraintVector = constraintVector;
+            }
             
+            Constraint.prototype.enforce = function() {
+                //Ensure vector a and b respect the constraint vector
+                let diff = Vector2d.diff(this.vectorA, this.vectorB);
+
+                if(diff.x != this.constraintVector.x) {
+                    
+                }
+
+                if(diff.y != this.constraintVector.y) {
+
+                }
+
+            }
+
+           function RigidBody() {
+
+                //Position is defined in terms of top left corner
+                this.position = new Vector2d(0,0);
+                //Defined our boundary
+                this.points = [
+                    new Vector2d(0, 0),
+                    new Vector2d(0, 64),
+                    new Vector2d(64, 64),
+                    new Vector2d(64, 0)
+                ];
+                
+                //Define relationships between points in the boundary
+                this.constraints = [
+                    new Constraints(0, 1, new Vector2d(0, 64)),
+                    new Constraints(1, 2, new Vector2d(64, 0)),
+                    new Constraints(2, 3, new Vector2d(0, 64)),
+                    new Constraints(3, 0, new Vector2d(64, 0)),
+                    new Constraints(0, 2, new Vector2d(64, 64)),
+                     new Constraints(3, 1 ,new Vector2d(64, 64))
+                ];
+
+
+
+           }
+
+
+
+            //Iterate over the constraints, enforcing them on path
+            RigidBody.prototype.enforceConstraints = function() {
+                let self = this;
+                for(var i in self.constraints) {
+                    self.constraints[i].enforce();
+                }
+            }
+
+
+            function Vector2d(x, y) {
+               this.x = x;
+               this.y = y;
+            }
+
+            Vector2d.prototype.magnitude = function() {
+                    return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+            }
+                
+            Vector2d.prototype.invert = function() {
+                this.x = -this.x;
+                this.y = -this.y;
+                return this;
+            }
+            Vector2d.invert = function(v) {
+                return new Vector2d(-v.x, -v.y);
+            }
+
+            Vector2d.prototype.clone = function() {
+                return new Vector2d(this.x, this.y);
+            }
+            
+            Vector2d.prototype.add = function(v) {
+                this.x += v.x;
+                this.y += v.y;
+                return this;
+            };
+            
+            Vector2d.add = function(v1, v2) {
+                return new Vector2d(v1.x + v2.x, v1.y + v2.y);
+            };
+
+            Vector2d.prototype.subtract = function(v) {
+                this.x - v.x;
+                this.y - v.y;
+                return this;
+            };
+
+            Vector2d.subtract = function(v1, v2) {
+                return new Vector2d(v1.x - v2.x, v1.y - v2.y);
+            };
+            
+            Vector2d.prototype.normalize = function(v) {
+                    this.divide(this.magnitude());
+                    return this;
+            };
+
+            Vector2d.normalize = function(v) {
+                    return Vector2d.divide(v, v.magnitude());
+            };
+
+            Vector2d.prototype.divide = function(scalar) {
+                this.x /= scalar;
+                this.y /= scalar;
+                return this;
+            };
+
+            Vector2d.divide = function(v, scalar) {
+                return new Vector2d(v.x / scalar, v.y / scalar);
+            };
+
+            Vector2d.prototype.multiply = function(scalar) {
+                this.x *= scalar;
+                this.y *= scalar;
+                return this;
+            };
+
+            Vector2d.multiply = function(v, scalar) {
+                return new Vector2d(v.x * scalar, v.y * scalar);
+            };
+            
+            Vector2d.prototype.lookAt = function(v1, v2) {
+            };
+
+            Vector2d.lookAt = function(v1, v2) {
+            };
+
+            Vector2d.prototype.rotate = function(radians) {
+                var sin = Math.sin(radians);
+                var cos = Math.cos(radians);
+                this.x = this.x * cos - this.y * sin;
+                this.y = this.x * sin + this.y * cos;
+                return this;
+            }
+
+            Vector2d.rotate = function(v, radians) {
+                var sin = Math.sin(radians);
+                var cos = Math.cos(radians);
+                var x = v.x * cos - v.y * sin;
+                var y = v.x * sin + v.y * cos;
+                
+                return new Vector2d(x, y);
+            }
 
             function Game() {
                 let self = this;
