@@ -382,6 +382,8 @@
                 self.ctx.font = "30px Arial";
                 let fps = self.numTicks / (self.currentTickTimestamp - self.startTimestamp) * 1000;
                 self.ctx.fillText("FPS: " + fps.toFixed(0), 10, 50);
+                 self.ctx.fillStyle = "white";
+                self.ctx.fillText("FPS: " + fps.toFixed(0), 9, 49);
 
             }
 
@@ -439,6 +441,7 @@
 
                 var currentEdge = [];
                 for(let i in this.points) {
+                    
                     if(currentEdge.length < 2) {
                         currentEdge.push(this.points[i]);
                         if(currentEdge.length === 2) {
@@ -469,7 +472,7 @@
             
             Path.prototype.correctEdges = function() {
                 
-              
+                for(var x = 0; x < 3; x++) {
                     for(let i in this.edges) {
                         let edge = this.edges[i];
                         //Calculate current length
@@ -477,30 +480,30 @@
                         let v1v2 = Vector2d.subtract(edge.path[1], edge.path[0]);
                         let v1v2Length = v1v2.magnitude();
 
-                       
-                        let diff = v1v2Length - edge.length;
                         v1v2.normalize();
-
-                        edge.path[0].add(Vector2d.multiply(v1v2, diff));
-                        edge.path[1].subtract(Vector2d.multiply(v1v2, diff));
+                        
+                        let diff = v1v2Length - edge.length;
+                        
+                        edge.path[0].add(Vector2d.multiply(v1v2, diff/2));
+                        edge.path[1].subtract(Vector2d.multiply(v1v2, diff/2));
 
                     }
                 
-                    // //Apply constraints
-                    // for(let i in this.constraints) {
-                    //     let constraint = this.constraints[i];
-                    //     //Calculate current length
-                    //     let diff = Vector2d.subtract(constraint.path[0], constraint.path[1]);
-                    //     let length = diff.magnitude();
-                    //     diff.normalize();
+                    //Apply constraints
+                    for(let i in this.constraints) {
+                        let constraint = this.constraints[i];
+                        
+                        let v1v2 = Vector2d.subtract(constraint.path[1], constraint.path[0]);
+                        let v1v2Length = v1v2.magnitude();
 
-                    //     let lengthDiff = constraint.length - length;
-
-                    //     diff.multiply(lengthDiff);
-                    //     constraint.path[1].add(diff);
-
-                    // }
-
+                        v1v2.normalize();
+                        
+                        let diff = v1v2Length - constraint.length;
+                        
+                        constraint.path[0].add(Vector2d.multiply(v1v2, diff/2));
+                        constraint.path[1].subtract(Vector2d.multiply(v1v2, diff/2));
+                    }
+                }
             }           
 
             function Vector2d(x, y) {
@@ -536,8 +539,8 @@
             };
 
             Vector2d.prototype.subtract = function(v) {
-                this.x - v.x;
-                this.y - v.y;
+                this.x -= v.x;
+                this.y -= v.y;
                 return this;
             };
 
