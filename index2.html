@@ -6,8 +6,61 @@
         
         <script>
             document.addEventListener('DOMContentLoaded', function(e) {
-                let game = new Game();
-                game.run();
+                // let game = new Game();
+                // game.run();
+
+
+                let canvas = document.createElement('canvas');
+                canvas.width = 400;
+                canvas.height = 600;
+
+                document.body.appendChild(canvas);
+                
+                let ctx = canvas.getContext('2d');
+
+
+                let v1 = new Vector2d(108, 30);
+                let v2 = new Vector2d(70, -42);
+
+                let offsetX = 100;
+                let offsetY = 100;
+
+                ctx.strokeStyle = 'blue';
+                ctx.beginPath();
+                ctx.moveTo(offsetX, offsetY);
+                ctx.lineTo(offsetX + v1.x, offsetY + v1.y);
+                ctx.closePath();
+                ctx.stroke();
+
+                ctx.strokeStyle = 'black';
+                ctx.beginPath();
+                ctx.moveTo(offsetX - 80, offsetY + 20);
+                ctx.lineTo(offsetX - 80 + Vector2d.multiply(v1, 3).x, offsetY + 20 + Vector2d.multiply(v1, 3).y);
+                ctx.closePath();
+                ctx.stroke();
+
+                ctx.strokeStyle = 'red';
+                ctx.beginPath();
+                ctx.moveTo(offsetX, offsetY);
+                ctx.lineTo(offsetX + v2.x, offsetY + v2.y);
+                ctx.closePath();
+                ctx.stroke();
+                
+
+                let v3 = Vector2d.normalize(v2);
+                let v1v2Dot = Vector2d.dot(v1, v2);
+
+                v3.x = ( v1v2Dot / Vector2d.dot(v1, v1) ) * v1.x;
+                v3.y = ( v1v2Dot / Vector2d.dot(v1, v1) ) * v1.y;
+
+                ctx.strokeStyle = 'green';
+                ctx.beginPath();
+                ctx.moveTo(v2.x + offsetX, v2.y + offsetY);
+                ctx.lineTo(offsetX + v3.x, offsetY + v3.y);
+                ctx.closePath();
+                ctx.stroke();
+
+            
             });
 
 
@@ -412,7 +465,6 @@
 
             
             function BoundingBox(position, width, height) {
-
                 this.path = new Path([
                     new Vector2d(position.x, position.y),
                     new Vector2d(position.x + width, position.y),
@@ -421,8 +473,6 @@
                 ], [
                     [ 0, 2]
                 ]);
-                
-
             }
             
 
@@ -577,10 +627,12 @@
                 return new Vector2d(v.x * scalar, v.y * scalar);
             };
             
-            Vector2d.prototype.lookAt = function(v1, v2) {
+            Vector2d.dot = function(v1, v2) {
+                return v1.x * v2.x + v1.y * v2.y;
             };
-
-            Vector2d.lookAt = function(v1, v2) {
+            
+            Vector2d.prototype.dot = function(v2) {
+                 return this.x * v2.x + this.y * v2.y;
             };
 
             Vector2d.prototype.rotate = function(radians) {
