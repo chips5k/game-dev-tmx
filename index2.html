@@ -5,9 +5,97 @@
     <body>
         
         <script>
+
+            function Edge(start, end) {
+                this.start = start;
+                this.end = end;
+            }
+
+            //create a new edge that is e translated by v units 
+            Edge.translate = function(e, v) {
+                let c = e.clone();
+                c.start.add(v);
+                c.end.add(v);
+                return c;
+            }
+
+            //translate self by v units
+            Edge.prototype.translate = function(v) {
+                this.start.add(v);
+                this.end.add(v);
+                return this;
+            }   
+
+            //create a new edge that is the project of e1 onto e2
+            Edge.project = function(e1, e2) {
+                let difference = e2.difference();
+                let v1 = Vector2d.project(e1.start, difference);
+                let v2 = Vector2d.project(e1.end, difference);
+                let projectedNormalEdge = new Edge(v1, v2);
+
+              
+                
+                
+                //Translate the project edge to e2 location
+                
+                return projectedNormalEdge;
+            };  
+            
+
+            Edge.prototype.difference = function() {
+                return Vector2d.subtract(this.end, this.start);
+            }
+
+            Edge.difference = function(e) {
+                return Vector2d.subtract(e.end, e.start);
+            }
+
+
+            //project self onto edge e
+            Edge.prototype.project = function(e) {
+                this.start.project(e.end);
+                this.end.project(e.end);
+                return this;
+            }
+
+            Edge.prototype.clone = function() {
+                return new Edge(this.start.clone(), this.end.clone());
+            }
+
+            Edge.clone = function(e) {
+                return new Edge(e.start.clone(), e.end.clone());
+            }
+
+            Edge.prototype.normal = function() {
+                //extract a normal/unit vector representing the orientation of this edge
+                return Vector2d.subtract(this.end, this.start).normalize();
+            }
+            //Expand this edge by x units in either direction
+            Edge.prototype.expand = function(x) {
+
+                let normal = this.normal();
+                let expansion = Vector2d.multiply(normal, x);
+                this.start.subtract(expansion);
+                this.end.add(expansion);
+
+                return this;
+
+            }
+
+            //Create a version of e expanded by x in either direction
+            Edge.expand = function(e, x) {
+                let normal = e.normal();
+                let expansion = Vector2d.multiply(normal, x);
+                let c = e.clone();
+                c.start.subtract(expansion);
+                c.end.add(expansion);
+                return c;
+            }
+
+
             document.addEventListener('DOMContentLoaded', function(e) {
                 // let game = new Game();
-                // game.run();
+                // game.run(); 
 
 
                 let canvas = document.createElement('canvas');
@@ -17,50 +105,42 @@
                 document.body.appendChild(canvas);
                 
                 let ctx = canvas.getContext('2d');
-
-
-                let v1 = new Vector2d(108, 30);
-                let v2 = new Vector2d(70, -42);
-
-                let offsetX = 100;
-                let offsetY = 100;
-
-                ctx.strokeStyle = 'blue';
-                ctx.beginPath();
-                ctx.moveTo(offsetX, offsetY);
-                ctx.lineTo(offsetX + v1.x, offsetY + v1.y);
-                ctx.closePath();
-                ctx.stroke();
-
-                ctx.strokeStyle = 'black';
-                ctx.beginPath();
-                ctx.moveTo(offsetX - 80, offsetY + 20);
-                ctx.lineTo(offsetX - 80 + Vector2d.multiply(v1, 3).x, offsetY + 20 + Vector2d.multiply(v1, 3).y);
-                ctx.closePath();
-                ctx.stroke();
-
-                ctx.strokeStyle = 'red';
-                ctx.beginPath();
-                ctx.moveTo(offsetX, offsetY);
-                ctx.lineTo(offsetX + v2.x, offsetY + v2.y);
-                ctx.closePath();
-                ctx.stroke();
                 
+                
+                let edgeA = new Edge(new Vector2d(100, 100), new Vector2d(200, 50));
+                let edgeB = new Edge(new Vector2d(0, 0), new Vector2d(300, 180));
 
-                let v3 = Vector2d.normalize(v2);
-                let v1v2Dot = Vector2d.dot(v1, v2);
+                // let edgeA = new Edge(new Vector2d(110, 110), new Vector2d(200, 200));//blue
+                // let edgeB = new Edge(new Vector2d(0, 0), new Vector2d(200, 250));//red
 
-                v3.x = ( v1v2Dot / Vector2d.dot(v1, v1) ) * v1.x;
-                v3.y = ( v1v2Dot / Vector2d.dot(v1, v1) ) * v1.y;
+                let edgeC = Edge.project(edgeA, edgeB);
+                
+               
+                let edgeRenderQueue = [ 
+                    {
+                        color: 'blue',
+                        edge: edgeA
+                    }, 
+                    {
+                        color: 'red',
+                        edge: edgeB
+                    }, 
+                    {
+                        color: 'black',
+                        edge: edgeC
+                    }
+                ]; 
+                
+                for(let i in edgeRenderQueue) {
+                    let item = edgeRenderQueue[i];
+                    ctx.beginPath();
+                    ctx.moveTo(item.edge.start.x, item.edge.start.y);
+                    ctx.lineTo(item.edge.end.x, item.edge.end.y);
+                    ctx.closePath();
+                    ctx.strokeStyle = item.color;
+                    ctx.stroke();
+                }
 
-                ctx.strokeStyle = 'green';
-                ctx.beginPath();
-                ctx.moveTo(v2.x + offsetX, v2.y + offsetY);
-                ctx.lineTo(offsetX + v3.x, offsetY + v3.y);
-                ctx.closePath();
-                ctx.stroke();
-
-            
             });
 
 
@@ -650,6 +730,32 @@
                 var y = v.x * sin + v.y * cos;
                 
                 return new Vector2d(x, y);
+            }   
+            
+            //Create a new vector that is v1 projected onto v2
+            Vector2d.project = function(v1, v2) {
+
+                let v3 = Vector2d.normalize(v1);
+                let v1v2Dot = Vector2d.dot(v1, v2);
+                let v2Dot = Vector2d.dot(v2, v2);
+
+                v3.x = v1v2Dot / v2Dot * v2.x;
+                v3.y = v1v2Dot / v2Dot * v2.y;
+                
+                return v3;
+
+            };
+
+            //Project self onto v2
+            Vector2d.prototype.project = function(v2) {
+                let v3 = Vector2d.normalize(v2);
+                let v1v2Dot = Vector2d.dot(this, v2);
+                let v2Dot = Vector2d.dot(v2, v2);
+
+                this.x = v1v2Dot / v2Dot * this.x;
+                this.y = v1v2Dot / v2Dot * this.y;
+                return this;
+
             }
 
 
