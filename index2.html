@@ -28,17 +28,24 @@
 
             //create a new edge that is the project of e1 onto e2
             Edge.project = function(e1, e2) {
-                let difference = e2.difference();
-                let v1 = Vector2d.project(e1.start, difference);
-                let v2 = Vector2d.project(e1.end, difference);
-                let projectedNormalEdge = new Edge(v1, v2);
 
-              
+
+
+                return new Edge(new Vector2d(0,0), e2.difference());
+                // let v1 = Vector2d.project(e1.start, difference);
+                // let v2 = Vector2d.project(e1.end, difference);
+                // let projectedNormalEdge = new Edge(v1, v2);
+
                 
+                // let v3 = Vector2d.normalize(v2);
+                // let v1v2Dot = Vector2d.dot(v1, v3);
+
+                // v3.multiply(v1v2Dot);
+                
+
                 
                 //Translate the project edge to e2 location
-                
-                return projectedNormalEdge;
+
             };  
             
 
@@ -110,12 +117,25 @@
                 let edgeA = new Edge(new Vector2d(100, 100), new Vector2d(200, 50));
                 let edgeB = new Edge(new Vector2d(0, 0), new Vector2d(300, 180));
 
-                // let edgeA = new Edge(new Vector2d(110, 110), new Vector2d(200, 200));//blue
-                // let edgeB = new Edge(new Vector2d(0, 0), new Vector2d(200, 250));//red
+                // let edgeA = new Edge(new Vector2d(110, 210), new Vector2d(170, 230));//blue
+                // let edgeB = new Edge(new Vector2d(350, 130), new Vector2d(200, 250));//red
 
-                let edgeC = Edge.project(edgeA, edgeB);
+              
+
+                let diffVector = edgeB.difference();
                 
+
+                let projectionA = Vector2d.project(edgeA.start, diffVector);
+                let projectionB =  Vector2d.project(edgeB.start, diffVector);
+                let edgeC = new Edge(edgeA.start, projectionA.subtract(projectionB).add(edgeB.start));
+
+                let projectionC = Vector2d.project(edgeA.end, diffVector);
+                 let projectionD = Vector2d.project(edgeB.end, diffVector);
+                let edgeD = new Edge(edgeA.end, projectionC.subtract(projectionB).add(edgeB.start));
                
+               
+            
+
                 let edgeRenderQueue = [ 
                     {
                         color: 'blue',
@@ -126,9 +146,13 @@
                         edge: edgeB
                     }, 
                     {
-                        color: 'black',
+                        color: 'pink',
                         edge: edgeC
-                    }
+                    },
+                    {
+                        color: 'pink',
+                        edge: edgeD
+                    },
                 ]; 
                 
                 for(let i in edgeRenderQueue) {
@@ -735,12 +759,10 @@
             //Create a new vector that is v1 projected onto v2
             Vector2d.project = function(v1, v2) {
 
-                let v3 = Vector2d.normalize(v1);
-                let v1v2Dot = Vector2d.dot(v1, v2);
-                let v2Dot = Vector2d.dot(v2, v2);
+                let v3 = Vector2d.normalize(v2);
+                let v1v2Dot = Vector2d.dot(v1, v3);
 
-                v3.x = v1v2Dot / v2Dot * v2.x;
-                v3.y = v1v2Dot / v2Dot * v2.y;
+                v3.multiply(v1v2Dot);
                 
                 return v3;
 
@@ -748,13 +770,13 @@
 
             //Project self onto v2
             Vector2d.prototype.project = function(v2) {
-                let v3 = Vector2d.normalize(v2);
-                let v1v2Dot = Vector2d.dot(this, v2);
-                let v2Dot = Vector2d.dot(v2, v2);
+                // let v3 = Vector2d.normalize(v2);
+                // let v1v2Dot = Vector2d.dot(this, v3);
+                // let v2Dot = Vector2d.dot(v2, v2);
 
-                this.x = v1v2Dot / v2Dot * this.x;
-                this.y = v1v2Dot / v2Dot * this.y;
-                return this;
+                // this.x = v1v2Dot / v2Dot * this.x;
+                // this.y = v1v2Dot / v2Dot * this.y;
+                // return this;
 
             }
 
