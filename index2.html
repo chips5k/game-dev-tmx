@@ -29,24 +29,37 @@
             //create a new edge that is the project of e1 onto e2
             Edge.project = function(e1, e2) {
 
+                //obtain a vector representing the edge to project onto
+                //E.g this is edge 2 orientation/length  but from origin 0, 0
+                let axis = e2.difference();
 
 
-                return new Edge(new Vector2d(0,0), e2.difference());
-                // let v1 = Vector2d.project(e1.start, difference);
-                // let v2 = Vector2d.project(e1.end, difference);
-                // let projectedNormalEdge = new Edge(v1, v2);
+                //Next project the start and end of edge 1 onto this axis
+                let e1StartProjection = Vector2d.project(e1.start, axis);
+                let e1EndProjection = Vector2d.project(e1.end, axis);
 
+
+                //Next project edge 2 onto the axis we calculated from it 
+                let e2StartProjection =  Vector2d.project(e2.start, axis);
                 
-                // let v3 = Vector2d.normalize(v2);
-                // let v1v2Dot = Vector2d.dot(v1, v3);
 
-                // v3.multiply(v1v2Dot);
-                
+                //Currently we have edge 1 projected against the axis of edge 2, the axis if you recall,
+                //is drawn from origin, and not the true location of edge 2. thus we need to remove the projection of edge 2 (start) onto its axis projection, from projections A and B in order to reduce the two projections to their true unit lengths FROM the start of edge 2.
+                // once the projection of edge 2 has been subtracted, we can then ADD the start of edge 2 to both, which provide us with the true coordinates.
+                //The above is quite possibly the most fucked up comment i have written....i promise i'll come back and give it some love...
+                let edge3 = new Edge(e1StartProjection.subtract(e2StartProjection).add(e2.start), e1EndProjection.subtract(e2StartProjection).add(e2.start));
 
-                
-                //Translate the project edge to e2 location
-
+                return edge3;
+            
             };  
+
+            
+            //project self onto edge e
+            Edge.prototype.project = function(e) {
+                this.start.project(e.end);
+                this.end.project(e.end);
+                return this;
+            }
             
 
             Edge.prototype.difference = function() {
@@ -58,12 +71,6 @@
             }
 
 
-            //project self onto edge e
-            Edge.prototype.project = function(e) {
-                this.start.project(e.end);
-                this.end.project(e.end);
-                return this;
-            }
 
             Edge.prototype.clone = function() {
                 return new Edge(this.start.clone(), this.end.clone());
@@ -117,25 +124,9 @@
                 let edgeA = new Edge(new Vector2d(100, 100), new Vector2d(200, 50));
                 let edgeB = new Edge(new Vector2d(0, 0), new Vector2d(300, 180));
 
-                // let edgeA = new Edge(new Vector2d(110, 210), new Vector2d(170, 230));//blue
-                // let edgeB = new Edge(new Vector2d(350, 130), new Vector2d(200, 250));//red
+                let edgeC = Edge.project(edgeA, edgeB);
 
-              
-
-                let diffVector = edgeB.difference();
-                
-
-                let projectionA = Vector2d.project(edgeA.start, diffVector);
-                let projectionB =  Vector2d.project(edgeB.start, diffVector);
-                let edgeC = new Edge(edgeA.start, projectionA.subtract(projectionB).add(edgeB.start));
-
-                let projectionC = Vector2d.project(edgeA.end, diffVector);
-                 let projectionD = Vector2d.project(edgeB.end, diffVector);
-                let edgeD = new Edge(edgeA.end, projectionC.subtract(projectionB).add(edgeB.start));
-               
-               
-            
-
+                    
                 let edgeRenderQueue = [ 
                     {
                         color: 'blue',
@@ -148,10 +139,6 @@
                     {
                         color: 'pink',
                         edge: edgeC
-                    },
-                    {
-                        color: 'pink',
-                        edge: edgeD
                     },
                 ]; 
                 
