@@ -1,6 +1,9 @@
+import Vector from './Vector';
+
 export default function Edge(start, end) {
     this.start = start;
     this.end = end;
+    this.originalLength = Vector.subtract(end, start).magnitude();
 }
 
 //create a new edge that is e translated by v units 
@@ -96,4 +99,34 @@ Edge.expand = function(e, x) {
     c.start.subtract(expansion);
     c.end.add(expansion);
     return c;
+}
+
+Edge.prototype.correct = function() {
+    //Obtain the vector that represents this edge
+    let diffVector = this.difference();
+    
+   
+    //Obtain its current length
+    let diffLength = diffVector.magnitude();
+
+    //normalize so we can work with it later
+    diffVector.normalize();
+  
+    //Calculate how much we need to increase/decrease each end of the edge's length
+    diffVector.multiply((diffLength - this.originalLength) / 2);
+
+    
+    //Add the half length scaled diff vector to correct the edges
+    this.start.add(diffVector);
+    
+    //Subtract the half length scaled diff vector to correct the edges
+    this.end.subtract(diffVector);
+
+    return this;
+}
+
+Edge.correct = function() {
+
+    throw 'Not Implemented';
+    
 }

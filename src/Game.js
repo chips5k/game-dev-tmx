@@ -1,13 +1,12 @@
-import Player from './Player';
-import Path from './Path';
-import BoundingBox from './BoundingBox';
 import Edge from './Edge';
 import Vector from './Vector';
 import RigidBody from './RigidBody';
 import tilesheet from './images/tilesheet.png';
-
+import GameObjectFactory from './GameObjectFactory';
 export default function Game(document) {
     let self = this;
+
+    let factory = new GameObjectFactory();
 
     self.currentHeight = 400;
     self.currentWidth = 600;
@@ -44,9 +43,7 @@ export default function Game(document) {
         { x: 127, y: 63 }
     ];
 
-    self.player = new Player(new Vector(264,264));
-    
-    
+    self.player = factory.createSquareRigidBody(0, 0, 24, 24);
 
     self.tileRigidBodies = {
         // '1': new RigidBody([
@@ -162,8 +159,6 @@ Game.prototype.run = function() {
     self.registerListeners();
 
     
-
-    
     self.loadAssets().then(function() {
         
         self.tick();
@@ -206,37 +201,28 @@ Game.prototype.tick = function() {
 Game.prototype.processInput = function() {
     let self = this;
 
-    let edge = self.player.boundingBox.path.edges[0];
-    let direction = Vector.subtract(edge.path[1], edge.path[0]).normalize();
-    
+    let edge = self.player.edges.start;
+    let direction = self.player.edges[0].difference().normalize();
+    let translation = new Vector(0, 0);
 
     if(self.keyMap['s']) {
-        self.player.translate(new Vector(0, 1));
-        
-        self.player.boundingBox.path.correctEdges();
-
+        translation.y += 1;
     }
 
     if(self.keyMap['w']) {
-        self.player.translate(new Vector(0, -1));
-        
-        self.player.boundingBox.path.correctEdges();
-
+        translation.y -= 1;
     }
 
     if(self.keyMap['a']) {
-        self.player.translate(new Vector(-1, 0));
-        
-        self.player.boundingBox.path.correctEdges();
+        translation.x -= 1;
 
     }
 
     if(self.keyMap['d']) {
-        self.player.translate(new Vector(1, 0));
-        
-        self.player.boundingBox.path.correctEdges();
-
+        translation.x += 1;
     }
+    
+    self.player.translate(translation);
 }
 
 
@@ -340,22 +326,22 @@ Game.prototype.renderScene = function() {
     }
 
     
-    for(var i in self.player.boundingBox.path.edges) {
+    for(var i in self.player.edges) {
         
-        let edge = self.player.boundingBox.path.edges[i];  
+        let edge = self.player.edges[i];  
         
         self.ctx.strokeStyle = 'red';
         self.ctx.beginPath();
-        self.ctx.moveTo(edge.path[0].x, edge.path[0].y);
-        self.ctx.lineTo(edge.path[1].x, edge.path[1].y);
+        self.ctx.moveTo(edge.end.x, edge.end.y);
+        self.ctx.lineTo(edge.start.x, edge.start.y);
         self.ctx.closePath();
         self.ctx.stroke();
 
         if(i == 0) {
             self.ctx.fillStyle = 'yellow';
-            self.ctx.fillRect(edge.path[0].x - 3, edge.path[0].y -3, 6, 6);
+            self.ctx.fillRect(edge.end.x - 3, edge.end.y -3, 6, 6);
             self.ctx.fillStyle = 'orange';
-            self.ctx.fillRect(edge.path[1].x - 3, edge.path[1].y - 3, 6, 6);
+            self.ctx.fillRect(edge.start.x - 3, edge.start.y - 3, 6, 6);
         }
 
     }
