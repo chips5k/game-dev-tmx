@@ -44,6 +44,7 @@ export default function Game(document) {
     ];
 
     self.player = factory.createSquareRigidBody(0, 0, 24, 24);
+    self.other = factory.createSquareRigidBody(200, 50, 64, 64);
 
     self.tileRigidBodies = {
         // '1': new RigidBody([
@@ -201,8 +202,6 @@ Game.prototype.tick = function() {
 Game.prototype.processInput = function() {
     let self = this;
 
-    let edge = self.player.edges.start;
-    let direction = self.player.edges[0].difference().normalize();
     let translation = new Vector(0, 0);
 
     if(self.keyMap['s']) {
@@ -222,7 +221,9 @@ Game.prototype.processInput = function() {
         translation.x += 1;
     }
     
-    self.player.translate(translation);
+    if(translation.x != 0 || translation.y != 0) {
+        self.player.translate(translation);
+    }
 }
 
 
@@ -279,8 +280,90 @@ Game.prototype.findPixelPosition = function(tX, tY) {
 Game.prototype.processPhysics = function() {
     let self = this;
 
+    let colliding = true;
+    let collisionResponseVector = null;
 
-    // let tileCoordinates = self.findTileCoordinates(self.player.topLeft().x, self.player.topLeft().y);
+    var i = 0;
+    for(var i in self.player.edges) {
+
+        //Grab the edge we want to test
+        let pEdge = self.player.edges[i];
+        //Grab the axis we are going to project onto
+        let axis = Edge.difference(pEdge).normalize();
+
+        //pMin/pMax are the min/max projection points on the axis for the player object
+        let pMin = null;
+        let pMax = null;
+
+        //iterate over the player object
+        for(var j in self.player.edges) {
+            let cEdge = self.player.edges[j];
+
+            let dotA = Vector.dot(cEdge.start, axis);
+            let dotB = Vector.dot(cEdge.end, axis);
+
+            if(pMin === null || dotA < pMin) {
+                pMin = dotA;
+            }
+
+            if(pMin === null || dotB < pMin) {
+                pMin = dotB;
+            }
+
+            if(pMax === null || dotA > pMax) {
+                pMax = dotA;
+            }
+
+            if(pMax === null || dotB > pMax) {
+                pMax = dotB;
+            }
+
+        }
+       
+
+
+        //oMin/pMax are the min/max projection points on the axis for the other object
+        let oMin = null;
+        let oMax = null;
+
+        //iterate over the player object
+        for(var j in self.other.edges) {
+            let cEdge = self.other.edges[j];
+
+            let dotA = Vector.dot(cEdge.start, axis);
+            let dotB = Vector.dot(cEdge.end, axis);
+
+            if(oMin === null || dotA < oMin) {
+                oMin = dotA;
+            }
+
+            if(oMin === null || dotB < oMin) {
+                oMin = dotB;
+            }
+
+            if(oMax === null || dotA > oMax) {
+                oMax = dotA;
+            }
+
+            if(oMax === null || dotB > oMax) {
+                oMax = dotB;
+            }
+
+        }   
+
+        if(pMax < oMin) {
+            colliding = false;
+            break;
+        } else {
+            collisionResponseVector = axis.multiply(pMax - pMin);
+        }
+       
+    }
+
+    if(colliding) {
+        console.log('Collision detected');
+        self.player.translate(collisionResponseVector);
+    }
     
     // let keys = Object.keys(tileCoordinates);
     // for(let i in keys) {
@@ -329,6 +412,26 @@ Game.prototype.renderScene = function() {
     for(var i in self.player.edges) {
         
         let edge = self.player.edges[i];  
+        
+        self.ctx.strokeStyle = 'red';
+        self.ctx.beginPath();
+        self.ctx.moveTo(edge.end.x, edge.end.y);
+        self.ctx.lineTo(edge.start.x, edge.start.y);
+        self.ctx.closePath();
+        self.ctx.stroke();
+
+        if(i == 0) {
+            self.ctx.fillStyle = 'yellow';
+            self.ctx.fillRect(edge.end.x - 3, edge.end.y -3, 6, 6);
+            self.ctx.fillStyle = 'orange';
+            self.ctx.fillRect(edge.start.x - 3, edge.start.y - 3, 6, 6);
+        }
+
+    }
+
+    for(var i in self.other.edges) {
+        
+        let edge = self.other.edges[i];  
         
         self.ctx.strokeStyle = 'red';
         self.ctx.beginPath();

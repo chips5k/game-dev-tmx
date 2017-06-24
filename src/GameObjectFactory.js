@@ -8,7 +8,7 @@ export default class GameObjectFactor {
         let v1 = new Vector(x, y);
         let v2 = new Vector(x + width, y);
         let v3 = new Vector(x + width, y + height);
-        let v4 = new Vector(x, x + height);
+        let v4 = new Vector(x, y + height);
 
         let e1 = new Edge(v1, v2);
         let e2 = new Edge(v2, v3);
@@ -18,7 +18,7 @@ export default class GameObjectFactor {
         let e6 = new Edge(v1, v4);
 
         let position = new Vector(x, y);
-        let rigidBody = new RigidBody(position, [e1, e2, e3, e4, e5, e6]);
+        let rigidBody = new RigidBody(position,[v1, v2, v3, v4], [e1, e2, e3, e4, e5, e6]);
 
         
         return rigidBody;
