@@ -2,10 +2,11 @@ import Vector from './Vector';
 
 export default class RigidBody {
 
-    constructor(position, points, edges) {
+    constructor(position, points, boundaryEdges, constraintEdges) {
         this.position = position;
         
-        this.edges = edges;
+        this.boundaryEdges = boundaryEdges;
+        this.constraintEdges = constraintEdges;
         this.vectors = points;
 
     }
@@ -13,8 +14,8 @@ export default class RigidBody {
     correctEdges() {
        
         //Iterate over each edge in this body 
-        for(let i in this.edges) {
-            let edge = this.edges[i];
+        for(let i in this.constraintEdges) {
+            let edge = this.constraintEdges[i];
             edge.correct();
         }
     }

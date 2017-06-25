@@ -284,20 +284,27 @@ Game.prototype.processPhysics = function() {
     let collisionResponseVector = null;
 
     var i = 0;
-    for(var i in self.player.edges) {
+
+    let minGap = null;
+    let minAxis = null;
+    let minEdge = null;
+    for(var i in self.player.boundaryEdges) {
 
         //Grab the edge we want to test
-        let pEdge = self.player.edges[i];
+        let pEdge = self.player.boundaryEdges[i];
         //Grab the axis we are going to project onto
         let axis = Edge.difference(pEdge).normalize();
+
+        
 
         //pMin/pMax are the min/max projection points on the axis for the player object
         let pMin = null;
         let pMax = null;
+        
 
         //iterate over the player object
-        for(var j in self.player.edges) {
-            let cEdge = self.player.edges[j];
+        for(var j in self.player.boundaryEdges) {
+            let cEdge = self.player.boundaryEdges[j];
 
             let dotA = Vector.dot(cEdge.start, axis);
             let dotB = Vector.dot(cEdge.end, axis);
@@ -325,10 +332,9 @@ Game.prototype.processPhysics = function() {
         //oMin/pMax are the min/max projection points on the axis for the other object
         let oMin = null;
         let oMax = null;
-
         //iterate over the player object
-        for(var j in self.other.edges) {
-            let cEdge = self.other.edges[j];
+        for(var j in self.other.boundaryEdges) {
+            let cEdge = self.other.boundaryEdges[j];
 
             let dotA = Vector.dot(cEdge.start, axis);
             let dotB = Vector.dot(cEdge.end, axis);
@@ -351,18 +357,25 @@ Game.prototype.processPhysics = function() {
 
         }   
 
-        if(pMax < oMin) {
+        let gap = oMin - pMax;
+
+        
+        
+        if(gap > 0) {
             colliding = false;
             break;
         } else {
-            collisionResponseVector = axis.multiply(pMax - pMin);
+            if(minGap == null || gap > minGap) {
+                minGap = gap;
+                minAxis = axis.clone();
+            }
         }
-       
+        
     }
 
+    
     if(colliding) {
-        console.log('Collision detected');
-        self.player.translate(collisionResponseVector);
+        self.player.translate(minAxis.multiply(minGap));
     }
     
     // let keys = Object.keys(tileCoordinates);
@@ -409,9 +422,9 @@ Game.prototype.renderScene = function() {
     }
 
     
-    for(var i in self.player.edges) {
+    for(var i in self.player.boundaryEdges) {
         
-        let edge = self.player.edges[i];  
+        let edge = self.player.boundaryEdges[i];  
         
         self.ctx.strokeStyle = 'red';
         self.ctx.beginPath();
@@ -429,9 +442,9 @@ Game.prototype.renderScene = function() {
 
     }
 
-    for(var i in self.other.edges) {
+    for(var i in self.other.boundaryEdges) {
         
-        let edge = self.other.edges[i];  
+        let edge = self.other.boundaryEdges[i];  
         
         self.ctx.strokeStyle = 'red';
         self.ctx.beginPath();
