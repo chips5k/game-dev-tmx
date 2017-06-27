@@ -20,6 +20,18 @@ Vector.prototype.clone = function() {
     return new Vector(this.x, this.y);
 }
 
+Vector.prototype.normal = function() {
+
+    let x = this.x;
+    this.x = this.y;
+    this.y = -x;
+    return this;
+}
+
+Vector.normal = function(v) {
+
+}
+
 Vector.prototype.add = function(v) {
     this.x += v.x;
     this.y += v.y;

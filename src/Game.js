@@ -46,6 +46,23 @@ export default function Game(document) {
     self.player = factory.createSquareRigidBody(0, 0, 24, 24);
     self.other = factory.createSquareRigidBody(200, 50, 64, 64);
 
+    self.player.constraintEdges[0].start.y += 40;
+    self.player.constraintEdges[0].end.y -= 40;
+
+    for(var j = 0; j < 5; j++) {
+        self.other.constraintEdges[0].start.y += 40;
+        for(var i = 0; i < 5; i++) {
+            self.player.correctEdges();
+            self.other.correctEdges();
+        }
+    }
+
+    self.other.constraintEdges[0].start.y += 60;
+     for(var i = 0; i < 5; i++) {
+        self.player.correctEdges();
+        self.other.correctEdges();
+    }
+
     self.tileRigidBodies = {
         // '1': new RigidBody([
         //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
@@ -288,20 +305,24 @@ Game.prototype.processPhysics = function() {
     let minGap = null;
     let minAxis = null;
     let minEdge = null;
-    for(var i in self.player.boundaryEdges) {
+
+    let edges = self.player.boundaryEdges.concat(self.other.boundaryEdges);
+
+
+    for(var i in edges) {
 
         //Grab the edge we want to test
-        let pEdge = self.player.boundaryEdges[i];
+        let pEdge = edges[i];
         //Grab the axis we are going to project onto
-        let axis = Edge.difference(pEdge).normalize();
+        let axis = Edge.difference(pEdge).normalize().normal();
 
         
-
+            
         //pMin/pMax are the min/max projection points on the axis for the player object
         let pMin = null;
         let pMax = null;
         
-
+        
         //iterate over the player object
         for(var j in self.player.boundaryEdges) {
             let cEdge = self.player.boundaryEdges[j];
@@ -422,9 +443,9 @@ Game.prototype.renderScene = function() {
     }
 
     
-    for(var i in self.player.boundaryEdges) {
+    for(var i in self.player.constraintEdges) {
         
-        let edge = self.player.boundaryEdges[i];  
+        let edge = self.player.constraintEdges[i];  
         
         self.ctx.strokeStyle = 'red';
         self.ctx.beginPath();
@@ -442,9 +463,9 @@ Game.prototype.renderScene = function() {
 
     }
 
-    for(var i in self.other.boundaryEdges) {
+    for(var i in self.other.constraintEdges) {
         
-        let edge = self.other.boundaryEdges[i];  
+        let edge = self.other.constraintEdges[i];  
         
         self.ctx.strokeStyle = 'red';
         self.ctx.beginPath();
