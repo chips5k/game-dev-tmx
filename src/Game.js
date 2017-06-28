@@ -46,22 +46,28 @@ export default function Game(document) {
     self.player = factory.createSquareRigidBody(0, 0, 24, 24);
     self.other = factory.createSquareRigidBody(200, 50, 64, 64);
 
+    self.other.boundaryEdges[0].end.y -= 40
+
+     self.other.boundaryEdges[1].end.y += 40
+     self.other.boundaryEdges[1].end.x += 40
+
     self.player.constraintEdges[0].start.y += 40;
     self.player.constraintEdges[0].end.y -= 40;
+    self.player.correctEdges();
+    self.player.correctEdges();
+    self.player.correctEdges();
+    self.player.correctEdges();
+    self.player.correctEdges();
 
-    for(var j = 0; j < 5; j++) {
-        self.other.constraintEdges[0].start.y += 40;
-        for(var i = 0; i < 5; i++) {
-            self.player.correctEdges();
-            self.other.correctEdges();
-        }
-    }
+    // for(var j = 0; j < 5; j++) {
+        
+    //     for(var i = 0; i < 5; i++) {
+    //         self.player.correctEdges();
+    //         self.other.correctEdges();
+    //     }
+    // }
 
-    self.other.constraintEdges[0].start.y += 60;
-     for(var i = 0; i < 5; i++) {
-        self.player.correctEdges();
-        self.other.correctEdges();
-    }
+    
 
     self.tileRigidBodies = {
         // '1': new RigidBody([
@@ -461,6 +467,8 @@ Game.prototype.renderScene = function() {
             self.ctx.fillRect(edge.start.x - 3, edge.start.y - 3, 6, 6);
         }
 
+        
+
     }
 
     for(var i in self.other.constraintEdges) {
@@ -480,7 +488,17 @@ Game.prototype.renderScene = function() {
             self.ctx.fillStyle = 'orange';
             self.ctx.fillRect(edge.start.x - 3, edge.start.y - 3, 6, 6);
         }
+        
+        // self.ctx.strokeStyle = 'blue';
+        // self.ctx.beginPath();
+        
+        // self.ctx.moveTo(100, 100);
+        // let normal = edge.difference().normal().add(new Vector(100, 100));
+        // self.ctx.lineTo(normal.x, normal.y);
+        // self.ctx.closePath();
+        // self.ctx.stroke();
 
+        
     }
 
     // self.ctx.fillRect(self.player.topLeft().x - self.viewport.x, self.player.topLeft().y - self.viewport.y, 64, 64);

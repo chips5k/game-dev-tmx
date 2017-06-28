@@ -23,8 +23,8 @@ Vector.prototype.clone = function() {
 Vector.prototype.normal = function() {
 
     let x = this.x;
-    this.x = this.y;
-    this.y = -x;
+    this.x = -this.y;
+    this.y = x;
     return this;
 }
 
