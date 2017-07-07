@@ -1,7 +1,10 @@
 import Edge from './Edge';
 import Vector from './Vector';
 import RigidBody from './RigidBody';
-import tilesheet from './images/tilesheet.png';
+import tilesheet from './assets/tilesheet.png';
+import tilemap from './assets/tilemap.json';
+
+console.log(tilemap);
 import GameObjectFactory from './GameObjectFactory';
 export default function Game(document) {
     let self = this;
@@ -35,13 +38,20 @@ export default function Game(document) {
         height: 400
     };
 
-    self.imageMap = [
-        { x: 0, y: 63 },
-        { x: 63, y: 0 },
-        { x: 0, y: 0 },
-        { x: 127, y: 0},
-        { x: 127, y: 63 }
-    ];
+    // self.imageMap = [
+    //     { x: 0, y: 63 },
+    //     { x: 63, y: 0 },
+    //     { x: 0, y: 0 },
+    //     { x: 127, y: 0},
+    //     { x: 127, y: 63 }
+    // ];
+
+    // self.tileMap = [
+    //     {
+            
+    //     }
+
+    // ];
 
     self.player = factory.createSquareRigidBody(0, 0, 24, 24);
     self.other = factory.createSquareRigidBody(200, 50, 64, 64);
@@ -69,97 +79,97 @@ export default function Game(document) {
 
     
 
-    self.tileRigidBodies = {
-        // '1': new RigidBody([
-        //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
-        //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
-        //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
-        // ]),
-        // '2': new RigidBody([
-        //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
-        //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
-        //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
-        // ]),
-        // '4': new RigidBody([
-        //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
-        //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
-        //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
-        // ])
-    };
+    // self.tileRigidBodies = {
+    //     // '1': new RigidBody([
+    //     //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
+    //     //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
+    //     //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
+    //     // ]),
+    //     // '2': new RigidBody([
+    //     //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
+    //     //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
+    //     //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
+    //     // ]),
+    //     // '4': new RigidBody([
+    //     //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
+    //     //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
+    //     //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
+    //     // ])
+    // };
 
-    self.scene = [
-        [
-            [
-                { z: 0, image: 1, collidable: true},
-                { z: 0, image: 2, collidable: true},
-                { z: 0, image: 1, collidable: true},
-                { z: 0, image: 1, collidable: true},
-                { z: 0, image: 1, collidable: true},
-                { z: 0, image: 2, collidable: true},
-                { z: 0, image: 1, collidable: true},
-                { z: 0, image: 2, collidable: true},
-                { z: 0, image: 3, collidable: true},
-            ],
-            [
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},  
-            ],
-            [
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},  
-            ]
-        ],
-        [
-            [
-                { z: 0, image: null, collidable: false},
-                { z: 0, image: null, collidable: false},
-                { z: 0, image: null, collidable: false},
-                { z: 0, image: null, collidable: false},
-                { z: 0, image: null, collidable: false},
-                { z: 0, image: null, collidable: false},
-                { z: 0, image: null, collidable: false},
-                { z: 0, image: null, collidable: false},
-                { z: 0, image: null, collidable: false},
-            ], 
-            [
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 4, collidable: true},  
-            ],
-            [
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 0, collidable: false},
-                { z: 0, image: 4, collidable: true},  
-            ],
-        ]
+    // self.scene = [
+    //     [
+    //         [
+    //             { z: 0, image: 1, collidable: true},
+    //             { z: 0, image: 2, collidable: true},
+    //             { z: 0, image: 1, collidable: true},
+    //             { z: 0, image: 1, collidable: true},
+    //             { z: 0, image: 1, collidable: true},
+    //             { z: 0, image: 2, collidable: true},
+    //             { z: 0, image: 1, collidable: true},
+    //             { z: 0, image: 2, collidable: true},
+    //             { z: 0, image: 3, collidable: true},
+    //         ],
+    //         [
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},  
+    //         ],
+    //         [
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},  
+    //         ]
+    //     ],
+    //     [
+    //         [
+    //             { z: 0, image: null, collidable: false},
+    //             { z: 0, image: null, collidable: false},
+    //             { z: 0, image: null, collidable: false},
+    //             { z: 0, image: null, collidable: false},
+    //             { z: 0, image: null, collidable: false},
+    //             { z: 0, image: null, collidable: false},
+    //             { z: 0, image: null, collidable: false},
+    //             { z: 0, image: null, collidable: false},
+    //             { z: 0, image: null, collidable: false},
+    //         ], 
+    //         [
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 4, collidable: true},  
+    //         ],
+    //         [
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 0, collidable: false},
+    //             { z: 0, image: 4, collidable: true},  
+    //         ],
+    //     ]
         
-    ];
+    // ];
 
 }
 
@@ -429,24 +439,49 @@ Game.prototype.processPhysics = function() {
     
 }
 
+
 Game.prototype.renderScene = function() {
     let self = this;
     
-    for(let l in self.scene) {
-        let layer = self.scene[l];
-        for(let tY in layer) {
-            let row = layer[tY];
-            for(let tX in row) {
-                let tile = row[tX];
-                
-                if(tile.image !== null) {
-                    if(tY * 64 + 64 >= self.viewport.y && tX * 64 + 64 >= self.viewport.x) {
-                        self.ctx.drawImage(self.spriteSheet, self.imageMap[tile.image].x, self.imageMap[tile.image].y, 64, 64, tX * 64 - self.viewport.x, tY * 64 - self.viewport.y, 64, 64);
-                    }
-                }
+    
+    for(let i in tilemap.layers) {
+        let layer = tilemap.layers[i];
+        for(let j in layer.data) {
+            let tileRef = layer.data[j] - 1;
+            let tile = tilemap.tilesets[0].tiles[tileRef];
+            let tY = parseInt(j / 100);
+            let tX = j - tY * 100;
+            
+            if(tY * 32 + 32 >= self.viewport.y && tX * 32 + 32 >= self.viewport.x) {
+
+                let iY= parseInt(tileRef / tilemap.tilesets[0].columns);
+                let iX = tileRef - iY * tilemap.tilesets[0].columns;
+                iY *= tilemap.tilesets[0].tileheight;
+                iX *= tilemap.tilesets[0].tilewidth;
+
+                self.ctx.drawImage(self.spriteSheet, iX, iY, tilemap.tilesets[0].tilewidth, tilemap.tilesets[0].tileheight, tX * 32 - self.viewport.x, tY * 32 - self.viewport.y, 32, 32);
+
             }
+
         }
+
     }
+
+    // for(let l in self.scene) {
+    //     let layer = self.scene[l];
+    //     for(let tY in layer) {
+    //         let row = layer[tY];
+    //         for(let tX in row) {
+    //             let tile = row[tX];
+                
+    //             if(tile.image !== null) {
+    //                 if(tY * 64 + 64 >= self.viewport.y && tX * 64 + 64 >= self.viewport.x) {
+    //                     self.ctx.drawImage(self.spriteSheet, self.imageMap[tile.image].x, self.imageMap[tile.image].y, 64, 64, tX * 64 - self.viewport.x, tY * 64 - self.viewport.y, 64, 64);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     
     for(var i in self.player.constraintEdges) {
