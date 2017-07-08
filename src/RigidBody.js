@@ -29,4 +29,13 @@ export default class RigidBody {
         return this;
     }
 
+    center() {
+
+        let v = Vector.subtract(this.vectors[2], this.vectors[1]);
+        v.divide(2);
+        v.add(this.vectors[0]);
+
+        return v;
+    }
+
 }

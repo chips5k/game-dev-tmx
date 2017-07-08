@@ -2,9 +2,8 @@ import Edge from './Edge';
 import Vector from './Vector';
 import RigidBody from './RigidBody';
 import tilesheet from './assets/tilesheet.png';
-import tilemap from './assets/tilemap.json';
+import tileMap from './assets/tileMap.json';
 
-console.log(tilemap);
 import GameObjectFactory from './GameObjectFactory';
 export default function Game(document) {
     let self = this;
@@ -13,6 +12,8 @@ export default function Game(document) {
 
     self.currentHeight = 400;
     self.currentWidth = 600;
+
+    self.tileMap = tileMap;
 
     self.canvas = document.createElement('canvas');
     self.canvas.width = self.currentWidth;
@@ -28,148 +29,34 @@ export default function Game(document) {
     self.numTicks = 0;
     self.tickTimestep = 16;//milliseconds
     self.keyMap = {};
+    self.state = 'active';
 
     self.spriteSheet = null;                
     
     self.viewport = {
-        x: 0, 
-        y: 0,
+        position: new Vector(0, 0),
         width: 600,
         height: 400
     };
 
-    // self.imageMap = [
-    //     { x: 0, y: 63 },
-    //     { x: 63, y: 0 },
-    //     { x: 0, y: 0 },
-    //     { x: 127, y: 0},
-    //     { x: 127, y: 63 }
-    // ];
 
-    // self.tileMap = [
-    //     {
-            
-    //     }
+    self.player = factory.createSquareRigidBody(64, 64, 32, 32);
+    // self.other = factory.createSquareRigidBody(200, 50, 64, 64);
 
-    // ];
+    // self.other.boundaryEdges[0].end.y -= 40
 
-    self.player = factory.createSquareRigidBody(0, 0, 24, 24);
-    self.other = factory.createSquareRigidBody(200, 50, 64, 64);
+    // self.other.boundaryEdges[1].end.y += 40
+    // self.other.boundaryEdges[1].end.x += 40
 
-    self.other.boundaryEdges[0].end.y -= 40
+    // self.player.constraintEdges[0].start.y += 40;
+    // self.player.constraintEdges[0].end.y -= 40;
+    // self.player.correctEdges();
+    // self.player.correctEdges();
+    // self.player.correctEdges();
+    // self.player.correctEdges();
+    // self.player.correctEdges();
 
-     self.other.boundaryEdges[1].end.y += 40
-     self.other.boundaryEdges[1].end.x += 40
 
-    self.player.constraintEdges[0].start.y += 40;
-    self.player.constraintEdges[0].end.y -= 40;
-    self.player.correctEdges();
-    self.player.correctEdges();
-    self.player.correctEdges();
-    self.player.correctEdges();
-    self.player.correctEdges();
-
-    // for(var j = 0; j < 5; j++) {
-        
-    //     for(var i = 0; i < 5; i++) {
-    //         self.player.correctEdges();
-    //         self.other.correctEdges();
-    //     }
-    // }
-
-    
-
-    // self.tileRigidBodies = {
-    //     // '1': new RigidBody([
-    //     //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
-    //     //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
-    //     //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
-    //     // ]),
-    //     // '2': new RigidBody([
-    //     //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
-    //     //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
-    //     //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
-    //     // ]),
-    //     // '4': new RigidBody([
-    //     //     new ConstrainedPath(new Vector(0, 0), new Vector(0, 64)),
-    //     //     new ConstrainedPath(new Vector(0, 64), new Vector(64, 64)),
-    //     //     new ConstrainedPath(new Vector(64, 64), new Vector(0, 0))
-    //     // ])
-    // };
-
-    // self.scene = [
-    //     [
-    //         [
-    //             { z: 0, image: 1, collidable: true},
-    //             { z: 0, image: 2, collidable: true},
-    //             { z: 0, image: 1, collidable: true},
-    //             { z: 0, image: 1, collidable: true},
-    //             { z: 0, image: 1, collidable: true},
-    //             { z: 0, image: 2, collidable: true},
-    //             { z: 0, image: 1, collidable: true},
-    //             { z: 0, image: 2, collidable: true},
-    //             { z: 0, image: 3, collidable: true},
-    //         ],
-    //         [
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},  
-    //         ],
-    //         [
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},  
-    //         ]
-    //     ],
-    //     [
-    //         [
-    //             { z: 0, image: null, collidable: false},
-    //             { z: 0, image: null, collidable: false},
-    //             { z: 0, image: null, collidable: false},
-    //             { z: 0, image: null, collidable: false},
-    //             { z: 0, image: null, collidable: false},
-    //             { z: 0, image: null, collidable: false},
-    //             { z: 0, image: null, collidable: false},
-    //             { z: 0, image: null, collidable: false},
-    //             { z: 0, image: null, collidable: false},
-    //         ], 
-    //         [
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 4, collidable: true},  
-    //         ],
-    //         [
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 0, collidable: false},
-    //             { z: 0, image: 4, collidable: true},  
-    //         ],
-    //     ]
-        
-    // ];
 
 }
 
@@ -208,27 +95,29 @@ Game.prototype.getTimestamp = function() {
 Game.prototype.tick = function() {
     let self = this;
 
-    self.numTicks++;
-    self.lastTickTimestamp = self.currentTickTimestamp;
-    self.currentTickTimestamp = self.getTimestamp();
+    if(self.state === 'active') {
+        self.numTicks++;
+        self.lastTickTimestamp = self.currentTickTimestamp;
+        self.currentTickTimestamp = self.getTimestamp();
 
-    window.requestAnimationFrame(self.tick.bind(self));
+        window.requestAnimationFrame(self.tick.bind(self));
 
-    //calculated time elapsed since last tick
-    self.accumulatedSinceLastTick = self.currentTickTimestamp - self.lastTickTimestamp;
+        //calculated time elapsed since last tick
+        self.accumulatedSinceLastTick = self.currentTickTimestamp - self.lastTickTimestamp;
 
-    while(self.accumulatedSinceLastTick >= 16) {
-        self.accumulatedSinceLastTick--;
-        self.processInput();
-        self.processPhysics();
-        
+        while(self.accumulatedSinceLastTick >= 16) {
+            self.accumulatedSinceLastTick--;
+            self.processInput();
+            self.processPhysics();
+            
+        }
+
+        //Render scene
+        self.clearCanvas();
+        //Need to interpolate physics state based on any remaining time to smooth things out
+        self.renderScene();
+        self.renderUi();
     }
-
-    //Render scene
-    self.clearCanvas();
-    //Need to interpolate physics state based on any remaining time to smooth things out
-    self.renderScene();
-    self.renderUi();
     
 }
 
@@ -260,59 +149,10 @@ Game.prototype.processInput = function() {
 }
 
 
-Game.prototype.findTileCoordinates = function(pX, pY) {
+
+
+Game.prototype.processNarrowPhaseCollisions = function() {
     let self = this;
-    let points = {
-        'topLeft': {pX: pX, pY: pY},
-        'bottomRight': {pX: pX + 64, pY: pY + 64},
-        'topRight': {pX: pX + 64, pY: pY},
-        'bottomLeft': {pX: pX, pY: pY + 64} 
-    }
-    
-    let keys = Object.keys(points);
-    for(let i in keys) {
-        let key = keys[i];
-        let tX = points[key].pX / 64;
-        let tY = points[key].pY / 64;
-        
-        
-        let iTx = parseInt(tX);
-        let iTy = parseInt(tY);
-        
-        
-        if(key === 'topRight' || key === 'bottomRight') {
-            if(tX - iTx <= 0) {
-                iTx--;
-            }
-        } else {
-            if(tX - iTx < 0) {
-                iTx--;
-            }
-        }
-
-        if(key === 'bottomLeft' || key === 'bottomRight') {
-            if(tY - iTy <= 0) {
-                iTy--;
-            }
-        } else {
-            if(tY - iTy < 0) {
-                iTy--;
-            }
-        }
-
-        points[key] = { tX: iTx, tY: iTy};
-    }
-
-    return points;
-}
-
-Game.prototype.findPixelPosition = function(tX, tY) {
-    return {x: 0, y: 0};
-}
-
-Game.prototype.processPhysics = function() {
-    let self = this;
-
     let colliding = true;
     let collisionResponseVector = null;
 
@@ -414,74 +254,103 @@ Game.prototype.processPhysics = function() {
     if(colliding) {
         self.player.translate(minAxis.multiply(minGap));
     }
-    
-    // let keys = Object.keys(tileCoordinates);
-    // for(let i in keys) {
-    //     let tileCoord = tileCoordinates[keys[i]];
-    //     //Check if a tile exists at the specified coordinate
-    //     for(let x in self.scene) {
-    //         let layer = self.scene[x];
-    //         if(layer[tileCoord.tY] && layer[tileCoord.tY][tileCoord.tX] && layer[tileCoord.tY][tileCoord.tX].collidable) {
-                
-    //             let tile = layer[tileCoord.tY][tileCoord.tX];
-    //             let rigidBody = self.tileRigidBodies[tile.image];
-    //             // self.player.topLeft().y += 1;
-    //             //self.player.topLeft().x -= 1;
-    //             //.console.log(self.player.topLeft().vectorA);
-    //             //self.player.rigidBody.enforceConstraints();
-                
-                
-    //         }
-    //     }
+}
+
+Game.prototype.processPhysics = function() {
+    let self = this;
 
 
-    // }
+    //Find the tile coordinates of player
+
+    //For each tile occupied, check if walkable
+
+    let intersectingTiles = [];
+
+    for(let i in self.player.vectors) {
+        let v = self.player.vectors[i];
+        let tX = Math.floor(v.x / self.tileMap.tilewidth);
+        let tY = Math.floor(v.y / self.tileMap.tileheight);
+
+        if(tX === -0) { tX = 0;}
+        if(tY === -0) { tY = 0;}
+
+        let index = tX + tY * self.tileMap.width;
+        
     
+        let tileRef = self.tileMap.layers[0].data[index] - 1;
+        let tile = self.tileMap.tilesets[0].tiles[tileRef];
+        if(tile) {
+            
+            let walkable = tile.objectgroup.properties.clip;
+            
+            if(!walkable) {
+                //Push the tile back to the boundary of the intersecting tile
+                //To do this, we need to find the shortest distance to move
+                //Calculate the cart coords of the tile
+
+                let cTx = tX * self.tileMap.tilewidth;
+                let cTy = tY * self.tileMap.tileheight;
+
+
+                //Calculate difference between vectors;
+                let dX = v.x - cTx;
+                let dY =  v.y - cTy;
+                
+                let midX = self.tileMap.tilewidth / 2;
+                let midY = self.tileMap.tileheight / 2;
+
+
+                if(Math.abs(dX) > 1) {
+                    if(dX < midX) {
+                        v.x = cTx;
+                    } else {
+                        v.x = cTx + self.tileMap.tilewidth;
+                    }
+                }
+
+                if(Math.abs(dY) > 1) {
+                    if(dY < midY) {
+                        v.y = cTy;
+                    } else {
+                        v.y = cTy + self.tileMap.tileheight;
+                    }   
+                }
+            }
+        }
+    }
+
+    for(var i = 0; i < 5; i++) {
+        self.player.correctEdges();
+    }
 }
 
 
 Game.prototype.renderScene = function() {
     let self = this;
     
-    
-    for(let i in tilemap.layers) {
-        let layer = tilemap.layers[i];
+    let pCenter = self.player.center();
+    self.viewport.position.x = pCenter.x - 264;
+    self.viewport.position.y = pCenter.y - 264;
+
+    for(let i in self.tileMap.layers) {
+        let layer = self.tileMap.layers[i];
         for(let j in layer.data) {
             let tileRef = layer.data[j] - 1;
-            let tile = tilemap.tilesets[0].tiles[tileRef];
-            let tY = parseInt(j / 100);
-            let tX = j - tY * 100;
-            
-            if(tY * 32 + 32 >= self.viewport.y && tX * 32 + 32 >= self.viewport.x) {
-
-                let iY= parseInt(tileRef / tilemap.tilesets[0].columns);
-                let iX = tileRef - iY * tilemap.tilesets[0].columns;
-                iY *= tilemap.tilesets[0].tileheight;
-                iX *= tilemap.tilesets[0].tilewidth;
-
-                self.ctx.drawImage(self.spriteSheet, iX, iY, tilemap.tilesets[0].tilewidth, tilemap.tilesets[0].tileheight, tX * 32 - self.viewport.x, tY * 32 - self.viewport.y, 32, 32);
-
-            }
-
-        }
-
-    }
-
-    // for(let l in self.scene) {
-    //     let layer = self.scene[l];
-    //     for(let tY in layer) {
-    //         let row = layer[tY];
-    //         for(let tX in row) {
-    //             let tile = row[tX];
+            if(tileRef >= 0) {
+                let tile = self.tileMap.tilesets[0].tiles[tileRef];
+                let tY = parseInt(j / 100);
+                let tX = j - tY * 100;
                 
-    //             if(tile.image !== null) {
-    //                 if(tY * 64 + 64 >= self.viewport.y && tX * 64 + 64 >= self.viewport.x) {
-    //                     self.ctx.drawImage(self.spriteSheet, self.imageMap[tile.image].x, self.imageMap[tile.image].y, 64, 64, tX * 64 - self.viewport.x, tY * 64 - self.viewport.y, 64, 64);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+                if(tY * self.tileMap.tileheight + self.tileMap.tileheight >= self.viewport.position.y && tX * self.tileMap.tilewidth + self.tileMap.tilewidth >= self.viewport.position.x) {
+                    let iY= parseInt(tileRef / self.tileMap.tilesets[0].columns);
+                    let iX = tileRef - iY * self.tileMap.tilesets[0].columns;
+                    iY *= self.tileMap.tilesets[0].tileheight;
+                    iX *= self.tileMap.tilesets[0].tilewidth;
+                    self.ctx.drawImage(self.spriteSheet, iX, iY, self.tileMap.tilesets[0].tilewidth, self.tileMap.tilesets[0].tileheight, tX * self.tileMap.tilewidth - self.viewport.position.x, tY * self.tileMap.tileheight - self.viewport.position.y, self.tileMap.tilewidth, self.tileMap.tileheight);
+                }
+            }
+        }
+    }
 
     
     for(var i in self.player.constraintEdges) {
@@ -490,54 +359,40 @@ Game.prototype.renderScene = function() {
         
         self.ctx.strokeStyle = 'red';
         self.ctx.beginPath();
-        self.ctx.moveTo(edge.end.x, edge.end.y);
-        self.ctx.lineTo(edge.start.x, edge.start.y);
+        self.ctx.moveTo(edge.end.x - self.viewport.position.x, edge.end.y - self.viewport.position.y);
+        self.ctx.lineTo(edge.start.x - self.viewport.position.x, edge.start.y - self.viewport.position.y);
         self.ctx.closePath();
         self.ctx.stroke();
 
         if(i == 0) {
             self.ctx.fillStyle = 'yellow';
-            self.ctx.fillRect(edge.end.x - 3, edge.end.y -3, 6, 6);
+            self.ctx.fillRect(edge.end.x - 3  - self.viewport.position.x, edge.end.y -3  - self.viewport.position.y, 6, 6);
             self.ctx.fillStyle = 'orange';
-            self.ctx.fillRect(edge.start.x - 3, edge.start.y - 3, 6, 6);
+            self.ctx.fillRect(edge.start.x - 3  - self.viewport.position.x, edge.start.y - 3  - self.viewport.position.y, 6, 6);
         }
 
         
 
     }
 
-    for(var i in self.other.constraintEdges) {
+    // for(var i in self.other.constraintEdges) {
         
-        let edge = self.other.constraintEdges[i];  
+    //     let edge = self.other.constraintEdges[i];  
         
-        self.ctx.strokeStyle = 'red';
-        self.ctx.beginPath();
-        self.ctx.moveTo(edge.end.x, edge.end.y);
-        self.ctx.lineTo(edge.start.x, edge.start.y);
-        self.ctx.closePath();
-        self.ctx.stroke();
+    //     self.ctx.strokeStyle = 'red';
+    //     self.ctx.beginPath();
+    //     self.ctx.moveTo(edge.end.x, edge.end.y);
+    //     self.ctx.lineTo(edge.start.x, edge.start.y);
+    //     self.ctx.closePath();
+    //     self.ctx.stroke();
 
-        if(i == 0) {
-            self.ctx.fillStyle = 'yellow';
-            self.ctx.fillRect(edge.end.x - 3, edge.end.y -3, 6, 6);
-            self.ctx.fillStyle = 'orange';
-            self.ctx.fillRect(edge.start.x - 3, edge.start.y - 3, 6, 6);
-        }
-        
-        // self.ctx.strokeStyle = 'blue';
-        // self.ctx.beginPath();
-        
-        // self.ctx.moveTo(100, 100);
-        // let normal = edge.difference().normal().add(new Vector(100, 100));
-        // self.ctx.lineTo(normal.x, normal.y);
-        // self.ctx.closePath();
-        // self.ctx.stroke();
-
-        
-    }
-
-    // self.ctx.fillRect(self.player.topLeft().x - self.viewport.x, self.player.topLeft().y - self.viewport.y, 64, 64);
-
+    //     if(i == 0) {
+    //         self.ctx.fillStyle = 'yellow';
+    //         self.ctx.fillRect(edge.end.x - 3, edge.end.y -3, 6, 6);
+    //         self.ctx.fillStyle = 'orange';
+    //         self.ctx.fillRect(edge.start.x - 3, edge.start.y - 3, 6, 6);
+    //     }
+    // }
 }
 
 Game.prototype.clearCanvas = function() {
