@@ -8,7 +8,7 @@ import GameObjectFactory from './GameObjectFactory';
 export default function Game(document) {
     let self = this;
 
-    let factory = new GameObjectFactory();
+    self.factory = new GameObjectFactory();
 
     self.currentHeight = 400;
     self.currentWidth = 600;
@@ -40,7 +40,7 @@ export default function Game(document) {
     };
 
 
-    self.player = factory.createSquareRigidBody(64, 64, 32, 32);
+    self.player = self.factory.createSquareRigidBody(64, 64, 32, 32);
     // self.other = factory.createSquareRigidBody(200, 50, 64, 64);
 
     // self.other.boundaryEdges[0].end.y -= 40
@@ -151,108 +151,108 @@ Game.prototype.processInput = function() {
 
 
 
-Game.prototype.processNarrowPhaseCollisions = function() {
+Game.prototype.processNarrowPhaseCollisions = function(rigidBodies) {
     let self = this;
-    let colliding = true;
-    let collisionResponseVector = null;
-
-    var i = 0;
-
-    let minGap = null;
-    let minAxis = null;
-    let minEdge = null;
-
-    let edges = self.player.boundaryEdges.concat(self.other.boundaryEdges);
-
-
-    for(var i in edges) {
-
-        //Grab the edge we want to test
-        let pEdge = edges[i];
-        //Grab the axis we are going to project onto
-        let axis = Edge.difference(pEdge).normalize().normal();
-
-        
-            
-        //pMin/pMax are the min/max projection points on the axis for the player object
-        let pMin = null;
-        let pMax = null;
-        
-        
-        //iterate over the player object
-        for(var j in self.player.boundaryEdges) {
-            let cEdge = self.player.boundaryEdges[j];
-
-            let dotA = Vector.dot(cEdge.start, axis);
-            let dotB = Vector.dot(cEdge.end, axis);
-
-            if(pMin === null || dotA < pMin) {
-                pMin = dotA;
-            }
-
-            if(pMin === null || dotB < pMin) {
-                pMin = dotB;
-            }
-
-            if(pMax === null || dotA > pMax) {
-                pMax = dotA;
-            }
-
-            if(pMax === null || dotB > pMax) {
-                pMax = dotB;
-            }
-
-        }
-       
-
-
-        //oMin/pMax are the min/max projection points on the axis for the other object
-        let oMin = null;
-        let oMax = null;
-        //iterate over the player object
-        for(var j in self.other.boundaryEdges) {
-            let cEdge = self.other.boundaryEdges[j];
-
-            let dotA = Vector.dot(cEdge.start, axis);
-            let dotB = Vector.dot(cEdge.end, axis);
-
-            if(oMin === null || dotA < oMin) {
-                oMin = dotA;
-            }
-
-            if(oMin === null || dotB < oMin) {
-                oMin = dotB;
-            }
-
-            if(oMax === null || dotA > oMax) {
-                oMax = dotA;
-            }
-
-            if(oMax === null || dotB > oMax) {
-                oMax = dotB;
-            }
-
-        }   
-
-        let gap = oMin - pMax;
-
-        
-        
-        if(gap > 0) {
-            colliding = false;
-            break;
-        } else {
-            if(minGap == null || gap > minGap) {
-                minGap = gap;
-                minAxis = axis.clone();
-            }
-        }
-        
-    }
-
     
-    if(colliding) {
-        self.player.translate(minAxis.multiply(minGap));
+    for(var x in rigidBodies) {
+        let colliding = true;
+        let collisionResponseVector = null;
+
+        var i = 0;
+
+        let minGap = null;
+        let minAxis = null;
+        let minEdge = null;
+
+
+        let rigidBody = rigidBodies[x];
+        let edges = self.player.boundaryEdges.concat(rigidBody.boundaryEdges);
+        for(var i in edges) {
+
+            //Grab the edge we want to test
+            let pEdge = edges[i];
+            //Grab the axis we are going to project onto
+            let axis = Edge.difference(pEdge).normalize().normal();
+
+            //pMin/pMax are the min/max projection points on the axis for the player object
+            let pMin = null;
+            let pMax = null;
+            
+            
+            //iterate over the player object
+            for(var j in self.player.boundaryEdges) {
+                let cEdge = self.player.boundaryEdges[j];
+
+                let dotA = Vector.dot(cEdge.start, axis);
+                let dotB = Vector.dot(cEdge.end, axis);
+
+                if(pMin === null || dotA < pMin) {
+                    pMin = dotA;
+                }
+
+                if(pMin === null || dotB < pMin) {
+                    pMin = dotB;
+                }
+
+                if(pMax === null || dotA > pMax) {
+                    pMax = dotA;
+                }
+
+                if(pMax === null || dotB > pMax) {
+                    pMax = dotB;
+                }
+
+            }
+        
+
+
+            //oMin/pMax are the min/max projection points on the axis for the other object
+            let oMin = null;
+            let oMax = null;
+            //iterate over the player object
+            for(var j in rigidBody.boundaryEdges) {
+                let cEdge = rigidBody.boundaryEdges[j];
+
+                let dotA = Vector.dot(cEdge.start, axis);
+                let dotB = Vector.dot(cEdge.end, axis);
+
+                if(oMin === null || dotA < oMin) {
+                    oMin = dotA;
+                }
+
+                if(oMin === null || dotB < oMin) {
+                    oMin = dotB;
+                }
+
+                if(oMax === null || dotA > oMax) {
+                    oMax = dotA;
+                }
+
+                if(oMax === null || dotB > oMax) {
+                    oMax = dotB;
+                }
+
+            }   
+
+            let gap = oMin - pMax;
+            
+            
+            if(gap > 0) {
+                colliding = false;
+                break;
+            } else {
+                if(minGap == null || gap > minGap) {
+                    minGap = gap;
+                    minAxis = axis.clone();
+                }
+            }
+            
+        }
+
+            
+        if(colliding) {
+            self.player.translate(minAxis.multiply(minGap));
+        }
     }
 }
 
@@ -284,43 +284,18 @@ Game.prototype.processPhysics = function() {
             let walkable = tile.objectgroup.properties.clip;
             
             if(!walkable) {
-                //Push the tile back to the boundary of the intersecting tile
-                //To do this, we need to find the shortest distance to move
-                //Calculate the cart coords of the tile
-
+                //Setup a bounding box to process collisions
                 let cTx = tX * self.tileMap.tilewidth;
                 let cTy = tY * self.tileMap.tileheight;
-
-
-                //Calculate difference between vectors;
-                let dX = v.x - cTx;
-                let dY =  v.y - cTy;
-                
-                let midX = self.tileMap.tilewidth / 2;
-                let midY = self.tileMap.tileheight / 2;
-
-
-                if(Math.abs(dX) > 1) {
-                    if(dX < midX) {
-                        v.x = cTx;
-                    } else {
-                        v.x = cTx + self.tileMap.tilewidth;
-                    }
-                }
-
-                if(Math.abs(dY) > 1) {
-                    if(dY < midY) {
-                        v.y = cTy;
-                    } else {
-                        v.y = cTy + self.tileMap.tileheight;
-                    }   
-                }
+                intersectingTiles.push(
+                    self.factory.createSquareRigidBody(cTx, cTy, self.tileMap.tilewidth, self.tileMap.tileheight)
+                );
             }
         }
     }
 
-    for(var i = 0; i < 5; i++) {
-        self.player.correctEdges();
+    if(intersectingTiles.length) {
+        self.processNarrowPhaseCollisions(intersectingTiles);
     }
 }
 
@@ -334,6 +309,7 @@ Game.prototype.renderScene = function() {
 
     for(let i in self.tileMap.layers) {
         let layer = self.tileMap.layers[i];
+        
         for(let j in layer.data) {
             let tileRef = layer.data[j] - 1;
             if(tileRef >= 0) {
@@ -350,49 +326,29 @@ Game.prototype.renderScene = function() {
                 }
             }
         }
-    }
-
-    
-    for(var i in self.player.constraintEdges) {
         
-        let edge = self.player.constraintEdges[i];  
-        
-        self.ctx.strokeStyle = 'red';
-        self.ctx.beginPath();
-        self.ctx.moveTo(edge.end.x - self.viewport.position.x, edge.end.y - self.viewport.position.y);
-        self.ctx.lineTo(edge.start.x - self.viewport.position.x, edge.start.y - self.viewport.position.y);
-        self.ctx.closePath();
-        self.ctx.stroke();
-
         if(i == 0) {
-            self.ctx.fillStyle = 'yellow';
-            self.ctx.fillRect(edge.end.x - 3  - self.viewport.position.x, edge.end.y -3  - self.viewport.position.y, 6, 6);
-            self.ctx.fillStyle = 'orange';
-            self.ctx.fillRect(edge.start.x - 3  - self.viewport.position.x, edge.start.y - 3  - self.viewport.position.y, 6, 6);
-        }
-
+            for(var x in self.player.constraintEdges) {
         
+                let edge = self.player.constraintEdges[x];  
+                
+                self.ctx.strokeStyle = 'red';
+                self.ctx.beginPath();
+                self.ctx.moveTo(edge.end.x - self.viewport.position.x, edge.end.y - self.viewport.position.y);
+                self.ctx.lineTo(edge.start.x - self.viewport.position.x, edge.start.y - self.viewport.position.y);
+                self.ctx.closePath();
+                self.ctx.stroke();
 
+                if(x == 0) {
+                    self.ctx.fillStyle = 'yellow';
+                    self.ctx.fillRect(edge.end.x - 3  - self.viewport.position.x, edge.end.y -3  - self.viewport.position.y, 6, 6);
+                    self.ctx.fillStyle = 'orange';
+                    self.ctx.fillRect(edge.start.x - 3  - self.viewport.position.x, edge.start.y - 3  - self.viewport.position.y, 6, 6);
+                }
+            }
+        }
     }
 
-    // for(var i in self.other.constraintEdges) {
-        
-    //     let edge = self.other.constraintEdges[i];  
-        
-    //     self.ctx.strokeStyle = 'red';
-    //     self.ctx.beginPath();
-    //     self.ctx.moveTo(edge.end.x, edge.end.y);
-    //     self.ctx.lineTo(edge.start.x, edge.start.y);
-    //     self.ctx.closePath();
-    //     self.ctx.stroke();
-
-    //     if(i == 0) {
-    //         self.ctx.fillStyle = 'yellow';
-    //         self.ctx.fillRect(edge.end.x - 3, edge.end.y -3, 6, 6);
-    //         self.ctx.fillStyle = 'orange';
-    //         self.ctx.fillRect(edge.start.x - 3, edge.start.y - 3, 6, 6);
-    //     }
-    // }
 }
 
 Game.prototype.clearCanvas = function() {
